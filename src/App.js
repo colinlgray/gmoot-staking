@@ -1,3 +1,5 @@
+import { Wallet } from "./components/Wallet/Wallet";
+
 function App() {
   return (
     <div className="app">
@@ -5,9 +7,7 @@ function App() {
         <div className="font-bold text-3xl select-none p-4 px-12">gmoot</div>
         <div className="font-bold">staking</div>
         <div className="px-12">
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Connect wallet
-          </button>
+          <Wallet />
         </div>
       </header>
       <div>
