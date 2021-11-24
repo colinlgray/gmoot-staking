@@ -21,7 +21,7 @@ import { clusterApiUrl } from "@solana/web3.js";
 // Default styles that can be overridden by your app
 require("@solana/wallet-adapter-react-ui/styles.css");
 
-export const Wallet = () => {
+export const WalletConnectionButton = () => {
   // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Devnet;
 
@@ -41,7 +41,6 @@ export const Wallet = () => {
     ],
     [network]
   );
-
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
