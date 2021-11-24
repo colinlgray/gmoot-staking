@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -12,19 +12,21 @@ import {
   getSolletExtensionWallet,
   getSolletWallet,
 } from "@solana/wallet-adapter-wallets";
+import {
+  WalletModalProvider,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
 import { clusterApiUrl } from "@solana/web3.js";
 
 // Default styles that can be overridden by your app
-require("@solana/wallet-adapter-react-ui/styles.css");
+// require("@solana/wallet-adapter-react-ui/styles.css");
 
-export const WalletContext = (props) => {
+export const WalletConnectionButton = () => {
   // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Devnet;
 
   // You can also provide a custom RPC endpoint
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  const [error, setError] = useState(null);
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking --
   // Only the wallets you configure here will be compiled into your application
@@ -39,16 +41,12 @@ export const WalletContext = (props) => {
     ],
     [network]
   );
-
-  const onError = useCallback((walletError) => {
-    console.log("error", walletError);
-  }, []);
-
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect onError={onError}>
-        {props.children}
-        {error}
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <WalletMultiButton />
+        </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

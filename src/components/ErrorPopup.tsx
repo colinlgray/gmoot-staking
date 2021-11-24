@@ -1,16 +1,24 @@
-export function ErrorPopup(props) {
+import React, { FC } from "react";
+
+interface Props {
+  onClose?: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+export const ErrorPopup: FC<Props> = (props) => {
   return (
     <div
-      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+      className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
       role="alert"
     >
       {props.children}
       <span
-        class="absolute top-0 bottom-0 right-0 px-4 py-3"
-        onClick={props.onClose && props.onClose()}
+        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+        onClick={(evt) => {
+          props.onClose && props.onClose(evt);
+        }}
       >
         <svg
-          class="fill-current h-6 w-6 text-red-500"
+          className="fill-current h-6 w-6 text-red-500"
           role="button"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -21,4 +29,4 @@ export function ErrorPopup(props) {
       </span>
     </div>
   );
-}
+};
