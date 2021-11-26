@@ -9,7 +9,7 @@ export function StakingInterface() {
   if (!publicKey) {
     return <ConnectWalletPrompt />;
   }
-  console.log("render", publicKey);
+
   return (
     <div>
       <div> Wallet: {wallet?.name}</div>
