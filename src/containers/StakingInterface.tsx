@@ -1,15 +1,19 @@
-import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
-import { useCallback } from "react";
-import { useNotify } from "../components/Notify";
-import { SendLamportButton } from "../components/SendLamportButton";
+import { useWallet } from "@solana/wallet-adapter-react";
+
+function ConnectWalletPrompt() {
+  return <div>Please connect your wallet</div>;
+}
 
 export function StakingInterface() {
+  const { publicKey, wallet } = useWallet();
+  if (!publicKey) {
+    return <ConnectWalletPrompt />;
+  }
+  console.log("render", publicKey);
   return (
     <div>
+      <div> Wallet: {wallet?.name}</div>
       <div className="text-lg py-4">Your gmoots:</div>
-      <SendLamportButton />
     </div>
   );
 }

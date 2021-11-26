@@ -2,8 +2,11 @@ import { WalletConnectionButton } from "./components/WalletConnectionButton";
 import { StakingInterface } from "./containers/StakingInterface";
 import { WalletConnectionProvider } from "./providers/WalletConnectionProvider";
 import { SnackbarProvider } from "notistack";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 function App() {
+  const { publicKey } = useWallet();
+  console.log("app render", publicKey);
   return (
     <div className="app">
       <SnackbarProvider>
