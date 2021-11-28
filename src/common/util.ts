@@ -5,6 +5,7 @@
 import { PublicKey } from "@solana/web3.js";
 import fs from "fs";
 import BN from "bn.js";
+import { programs } from "@metaplex/js";
 
 export function getEnumKeyByEnumValue(myEnum: any, enumValue: any) {
   const keys = Object.keys(myEnum).filter((x) => myEnum[x] == enumValue);
@@ -165,4 +166,18 @@ export function objectOneInsideObjectTwo(o1: any, o2: any): boolean {
 
 export function isIterable(value: any): boolean {
   return Symbol.iterator in Object(value);
+}
+
+export function filterGmoots(list: programs.metadata.Metadata[]) {
+  const creatorKey = "8mxiQyfXpWdohutWgq652XQ5LT4AaX4Lf5c4gZsdNLfd";
+  return list.filter((metadata) => {
+    const creators = metadata.data.data.creators?.filter((creator) => {
+      return (
+        creator.address === creatorKey &&
+        // This is incorrectly typed
+        (creator.verified as unknown as number) === 1
+      );
+    });
+    return creators && creators?.length > 0;
+  });
 }

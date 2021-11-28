@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { programs } from "@metaplex/js";
-import { Spinner, MintButton } from "../components";
+import { Spinner, NFTRow } from "../components";
 
 function ConnectWalletPrompt() {
   return <div>Please connect your wallet</div>;
@@ -22,7 +22,6 @@ export function StakingInterface() {
       setLoading(true);
       programs.metadata.Metadata.findByOwnerV2(connection, publicKey).then(
         (ownedMetadata) => {
-          console.log("ownedMetadata", ownedMetadata);
           setLoading(false);
           setNftList(ownedMetadata);
         }
@@ -45,22 +44,15 @@ export function StakingInterface() {
       </div>
     );
   }
-  const creatorKey = "8mxiQyfXpWdohutWgq652XQ5LT4AaX4Lf5c4gZsdNLfd";
-  const gmoots = nftList?.filter((metadata) => {
-    const creators = metadata.data.data.creators?.filter((creator) => {
-      return (
-        creator.address === creatorKey &&
-        // This is incorrectly typed
-        (creator.verified as unknown as number) === 1
-      );
-    });
-    return creators && creators?.length > 0;
-  });
 
   return (
     <div>
-      <MintButton />
-      <div className="text-lg py-4">Your gmoots: {gmoots?.length}</div>
+      <div className="text-lg py-4">Your nfts: {nftList?.length}</div>
+      <div>
+        {nftList?.map((nft) => {
+          return <NFTRow key={nft.pubkey.toString()} nft={nft} />;
+        })}
+      </div>
     </div>
   );
 }
