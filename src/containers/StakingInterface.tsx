@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { programs } from "@metaplex/js";
-import { Spinner, NFTRow } from "../components";
+import { Spinner } from "../components";
+import { NFTRow } from "./NFTRow";
 
 function ConnectWalletPrompt() {
   return <div>Please connect your wallet</div>;

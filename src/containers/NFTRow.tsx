@@ -1,7 +1,7 @@
 import { programs } from "@metaplex/js";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
-import { Spinner } from "./index";
+import { Spinner, StakeButton } from "../components";
 
 interface Props {
   nft: programs.metadata.Metadata;
@@ -15,7 +15,6 @@ export const NFTRow: FC<Props> = (props) => {
     axios
       .get(props.nft.data.data.uri)
       .then((res) => {
-        console.log("res", res?.data);
         setMetadata(res?.data);
         setLoading(false);
       })
@@ -41,10 +40,7 @@ export const NFTRow: FC<Props> = (props) => {
       <div>
         <div className="flex items-center">
           <img alt="nft" className="h-24 p-4" src={metadata.image} />
-
-          <button className="bg-green-500 hover:bg-green-700 font-bold py-1 px-2 rounded">
-            Stake
-          </button>
+          <StakeButton nft={metadata} />
         </div>
       </div>
     </div>
