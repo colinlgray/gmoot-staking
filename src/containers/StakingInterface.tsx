@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { programs } from "@metaplex/js";
-import { Spinner } from "../components/Spinner";
+import { Spinner, MintButton } from "../components";
 
 function ConnectWalletPrompt() {
   return <div>Please connect your wallet</div>;
@@ -59,6 +59,7 @@ export function StakingInterface() {
 
   return (
     <div>
+      <MintButton />
       <div className="text-lg py-4">Your gmoots: {gmoots?.length}</div>
     </div>
   );

@@ -2,11 +2,11 @@ import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 import { FC, useCallback } from "react";
-import { useNotify } from "../components/Notify";
+import { useNotify } from "../hooks/useNotify";
 
 export const SendLamportButton: FC = () => {
   const { connection } = useConnection();
-  const { publicKey, sendTransaction, wallet } = useWallet();
+  const { publicKey, sendTransaction } = useWallet();
   const notify = useNotify();
 
   const onClick = useCallback(async () => {
