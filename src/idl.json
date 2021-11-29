@@ -1,0 +1,512 @@
+{
+  "version": "0.0.0",
+  "name": "gmoot_staking",
+  "instructions": [
+    {
+      "name": "initializeRewarder",
+      "accounts": [
+        {
+          "name": "rewarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rewardAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "rewarderBump",
+          "type": "u8"
+        },
+        {
+          "name": "rewardAuthorityBump",
+          "type": "u8"
+        },
+        {
+          "name": "rewardRate",
+          "type": "u64"
+        },
+        {
+          "name": "collection",
+          "type": "string"
+        },
+        {
+          "name": "creators",
+          "type": {
+            "vec": {
+              "defined": "CreatorStruct"
+            }
+          }
+        },
+        {
+          "name": "nftUpdateAuthority",
+          "type": "publicKey"
+        },
+        {
+          "name": "enforceMetadata",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "updateRewardRate",
+      "accounts": [
+        {
+          "name": "rewarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "newRate",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initializeStakeAccount",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewarder",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "bump",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "stakeGmoot",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rewarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unstakeGmoot",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "rewarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nftTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nftVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "rewarder",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "stakeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "rewardAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GmootStakeRewarder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "rewardMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "rewardAuthorityBump",
+            "type": "u8"
+          },
+          {
+            "name": "rewardRate",
+            "type": "u64"
+          },
+          {
+            "name": "allowedUpdateAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": "CreatorStruct"
+              }
+            }
+          },
+          {
+            "name": "collection",
+            "type": "string"
+          },
+          {
+            "name": "enforceMetadata",
+            "type": "bool"
+          },
+          {
+            "name": "totalStaked",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GmootStakeAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "rewarder",
+            "type": "publicKey"
+          },
+          {
+            "name": "numStaked",
+            "type": "u16"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "lastClaimed",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatorStruct",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 300,
+      "name": "RewarderNotMintAuthority",
+      "msg": "The provided reward mint doesn't have the correct minting authority"
+    },
+    {
+      "code": 301,
+      "name": "InvalidRewarderAuthority",
+      "msg": "The provided authority is not valid for the rewarder"
+    },
+    {
+      "code": 302,
+      "name": "InvalidRewarder",
+      "msg": "The provided rewarder does not match the stake account"
+    },
+    {
+      "code": 303,
+      "name": "InvalidOwnerForStakeAccount",
+      "msg": "The provided owner does not own the stake account"
+    },
+    {
+      "code": 304,
+      "name": "InvalidRewardMint",
+      "msg": "The provided Mint is not valid for the provided Rewarder"
+    },
+    {
+      "code": 305,
+      "name": "InvalidOwnerForRewardToken",
+      "msg": "The provided reward token account is not owned by the provided owner"
+    },
+    {
+      "code": 306,
+      "name": "InvalidRewardTokenAccount",
+      "msg": "The provided reward token account is not for the reward token mint"
+    },
+    {
+      "code": 307,
+      "name": "InvalidNFTMintSupply",
+      "msg": "The provided NFT Mint has a supply that isn't 1"
+    },
+    {
+      "code": 308,
+      "name": "InvalidNFTOwner",
+      "msg": "The provided NFT token account is not owned by the provided owner"
+    },
+    {
+      "code": 309,
+      "name": "InvalidNFTAccountMint",
+      "msg": "The provided NFT token account is not for the NFT mint"
+    },
+    {
+      "code": 310,
+      "name": "NFTAccountEmpty",
+      "msg": "The provided NFT token account does not have the token"
+    },
+    {
+      "code": 311,
+      "name": "InvalidNFTVaultAddress",
+      "msg": "The provided NFT vault token account is not the associated token account for the provided NFT mint and stake account"
+    },
+    {
+      "code": 312,
+      "name": "NFTVaultEmpty",
+      "msg": "The provided NFT vault token account does not have the token"
+    },
+    {
+      "code": 313,
+      "name": "MetadataAccountNotFound",
+      "msg": "There was no Metaplex Metadata account supplied"
+    },
+    {
+      "code": 314,
+      "name": "MetadataAccountNotOwnedByCorrectProgram",
+      "msg": "The Metaplex Metadata account is not owned by the Metaplex Token Metadata program"
+    },
+    {
+      "code": 315,
+      "name": "InvalidMetadataAccountData",
+      "msg": "The Metaplex Metadata account failed to deserialze"
+    },
+    {
+      "code": 316,
+      "name": "InvalidMetadataAccountAddress",
+      "msg": "The Metaplex Metadata account did not have the expected PDA seeds"
+    },
+    {
+      "code": 317,
+      "name": "InvalidMetadataUpdateAuthority",
+      "msg": "The Metaplex Metadata account did not have the expected update authority"
+    },
+    {
+      "code": 318,
+      "name": "InvalidMetadataCollectionPrefix",
+      "msg": "The Metaplex Metadata account did not have a name beginning with the collection"
+    },
+    {
+      "code": 319,
+      "name": "InvalidMetadataCreators",
+      "msg": "The Metaplex Metadata account did not have the expected creators"
+    }
+  ]
+}
