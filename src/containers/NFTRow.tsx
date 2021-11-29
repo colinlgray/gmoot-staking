@@ -2,9 +2,11 @@ import { programs } from "@metaplex/js";
 import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { Spinner, StakeButton } from "../components";
+import { RewarderAccount } from "../hooks/useRewarder";
 
 interface Props {
   nft: programs.metadata.Metadata;
+  rewarder: RewarderAccount | null;
 }
 
 export const NFTRow: FC<Props> = (props) => {
@@ -40,7 +42,7 @@ export const NFTRow: FC<Props> = (props) => {
       <div>
         <div className="flex items-center">
           <img alt="nft" className="h-24 p-4" src={metadata.image} />
-          <StakeButton nft={metadata} />
+          <StakeButton {...props} />
         </div>
       </div>
     </div>

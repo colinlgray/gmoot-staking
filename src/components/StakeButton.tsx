@@ -1,26 +1,27 @@
 import { programs } from "@metaplex/js";
 import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
-import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { FC, useCallback, useState } from "react";
 import { Spinner } from "./index";
-import { useNotify } from "../hooks/useNotify";
-import { useProgram } from "../hooks/useProgram";
+import { useNotify, useProgram } from "../hooks";
+import { RewarderAccount } from "../hooks/useRewarder";
 
-interface Props {
+export interface StakeButtonProps {
   nft: programs.metadata.Metadata;
+  rewarder: RewarderAccount | null;
 }
 
-export const StakeButton: FC<Props> = (props) => {
-  const wallet = useAnchorWallet();
+export const StakeButton: FC<StakeButtonProps> = (props) => {
   const notify = useNotify();
 
   const [loading, setLoading] = useState(false);
   const program = useProgram();
+
+  console.log("rewarder", props.rewarder);
   // check has stake account
-  // check has reward account
 
   const onClick = useCallback(async () => {
-    if (!wallet || !wallet.publicKey) throw new WalletNotConnectedError();
+    // If there isn't a program it's because the wallet is undefined
+    if (!program) throw new WalletNotConnectedError();
     try {
       if (loading === true) return;
       setLoading(true);
@@ -35,7 +36,7 @@ export const StakeButton: FC<Props> = (props) => {
       setLoading(false);
       return;
     }
-  }, [wallet, notify, loading, program]);
+  }, [notify, loading, program]);
 
   if (loading) {
     return <Spinner />;
