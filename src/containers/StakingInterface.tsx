@@ -3,7 +3,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { programs } from "@metaplex/js";
 import { Spinner } from "../components";
 import { NFTRow } from "./NFTRow";
-import { useRewarder } from "../hooks";
+import { useRewarder, useStakeAccount } from "../hooks";
 
 function ConnectWalletPrompt() {
   return <div>Please connect your wallet</div>;
@@ -13,6 +13,7 @@ export function StakingInterface() {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
   const rewarder = useRewarder();
+  const stakeAccount = useStakeAccount();
 
   const [nftList, setNftList] = useState<programs.metadata.Metadata[] | null>(
     null
@@ -54,7 +55,12 @@ export function StakingInterface() {
       <div>
         {nftList?.map((nft) => {
           return (
-            <NFTRow key={nft.pubkey.toString()} nft={nft} rewarder={rewarder} />
+            <NFTRow
+              key={nft.pubkey.toString()}
+              nft={nft}
+              rewarder={rewarder}
+              stakeAccount={stakeAccount}
+            />
           );
         })}
       </div>

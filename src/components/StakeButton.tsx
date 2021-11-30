@@ -1,22 +1,16 @@
-import { programs } from "@metaplex/js";
 import { WalletNotConnectedError } from "@solana/wallet-adapter-base";
 import { FC, useCallback, useState } from "react";
 import { Spinner } from "./index";
+import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
-import { RewarderAccount } from "../hooks/useRewarder";
 
-export interface StakeButtonProps {
-  nft: programs.metadata.Metadata;
-  rewarder: RewarderAccount | null;
-}
-
-export const StakeButton: FC<StakeButtonProps> = (props) => {
+export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
 
   const [loading, setLoading] = useState(false);
   const program = useProgram();
 
-  console.log("rewarder", props.rewarder);
+  // console.log("rewarder", props.rewarder);
   // check has stake account
 
   const onClick = useCallback(async () => {

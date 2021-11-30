@@ -32,51 +32,50 @@ const collectionName = "gmoot";
 export function useRewarder() {
   const wallet = useAnchorWallet();
   const program = useProgram();
-  const [account, setAccount] = useState<RewarderAccount | null>(null);
+  const [account, setAccount] = useState<RewarderAccount | null | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     let didCancel = false;
     async function requestRewarder() {
-      // Wrap inner function to return instead of having to return teardown object
-      async function makeRequest() {
-        // TODO: Clear cache when wallet changes
-        if (!wallet || !program || account !== null) return;
-        const rewarder = (
-          await PublicKey.findProgramAddress(
-            [
-              Buffer.from(collectionName),
-              program.programId.toBuffer(),
-              Buffer.from("rewarder"),
-            ],
-            program.programId
-          )
-        )[0];
-        const rewardAuthority = (
-          await PublicKey.findProgramAddress(
-            [
-              Buffer.from(collectionName),
-              program.programId.toBuffer(),
-              Buffer.from("rewarder"),
-              rewarder.toBuffer(),
-            ],
-            program.programId
-          )
-        )[0];
+      // TODO: Clear cache when wallet changes
+      if (!wallet || !program || !!account) return;
+      const rewarder = (
+        await PublicKey.findProgramAddress(
+          [
+            Buffer.from(collectionName),
+            program.programId.toBuffer(),
+            Buffer.from("rewarder"),
+          ],
+          program.programId
+        )
+      )[0];
+      const rewardAuthority = (
+        await PublicKey.findProgramAddress(
+          [
+            Buffer.from(collectionName),
+            program.programId.toBuffer(),
+            Buffer.from("rewarder"),
+            rewarder.toBuffer(),
+          ],
+          program.programId
+        )
+      )[0];
 
-        const data = await program.account.gmootStakeRewarder.fetchNullable(
-          rewarder
-        );
-        if (!data) return;
-        return {
-          address: rewarder,
-          rewardAuthority,
-          data: data as RewarderAccountData,
-        } as RewarderAccount;
-      }
-
-      const acc = await makeRequest();
-      if (acc && !didCancel) {
-        setAccount(acc);
+      const data = await program.account.gmootStakeRewarder.fetchNullable(
+        rewarder
+      );
+      if (!didCancel) {
+        if (!data) {
+          setAccount(null);
+        } else {
+          setAccount({
+            address: rewarder,
+            rewardAuthority,
+            data: data as RewarderAccountData,
+          } as RewarderAccount);
+        }
       }
     }
 

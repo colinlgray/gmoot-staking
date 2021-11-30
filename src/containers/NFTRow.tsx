@@ -3,13 +3,15 @@ import axios from "axios";
 import { FC, useEffect, useState } from "react";
 import { Spinner, StakeButton } from "../components";
 import { RewarderAccount } from "../hooks/useRewarder";
+import { StakeAccount } from "../hooks/useStakeAccount";
 
-interface Props {
+export interface RowProps {
   nft: programs.metadata.Metadata;
-  rewarder: RewarderAccount | null;
+  rewarder?: RewarderAccount | null;
+  stakeAccount?: StakeAccount | null;
 }
 
-export const NFTRow: FC<Props> = (props) => {
+export const NFTRow: FC<RowProps> = (props) => {
   const [loading, setLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>({});
   useEffect(() => {
