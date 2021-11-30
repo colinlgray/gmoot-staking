@@ -14,7 +14,8 @@ export type StakeAccountData = {
 
 export type StakeAccount = {
   address: PublicKey;
-  data: StakeAccountData;
+  bump: number;
+  data?: StakeAccountData | null;
 };
 
 export function useStakeAccount() {
@@ -27,7 +28,7 @@ export function useStakeAccount() {
     let didCancel = false;
     const request = async () => {
       if (wallet && program && rewarder) {
-        const stakeAccountPDA = (
+        const [stakeAccountPDA, stakeAccountBump] =
           await PublicKey.findProgramAddress(
             [
               Buffer.from(rewarder.data.collection),
@@ -37,21 +38,17 @@ export function useStakeAccount() {
               wallet.publicKey.toBuffer(),
             ],
             program.programId
-          )
-        )[0];
+          );
 
         const data = await program.account.gmootStakeAccount.fetchNullable(
           stakeAccountPDA
         );
         if (!didCancel) {
-          if (data) {
-            setAccount({
-              address: stakeAccountPDA,
-              data: data as StakeAccountData,
-            } as StakeAccount);
-          } else {
-            setAccount(null);
-          }
+          setAccount({
+            bump: stakeAccountBump,
+            address: stakeAccountPDA,
+            data: data as StakeAccountData,
+          } as StakeAccount);
         }
       }
     };

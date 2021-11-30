@@ -3,14 +3,15 @@ import { FC, useCallback, useState } from "react";
 import { Spinner } from "./index";
 import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
 
   const [loading, setLoading] = useState(false);
   const program = useProgram();
+  const wallet = useWallet();
 
-  // console.log("rewarder", props.rewarder);
   // check has stake account
 
   const onClick = useCallback(async () => {
@@ -19,8 +20,22 @@ export const StakeButton: FC<RowProps> = (props) => {
     try {
       if (loading === true) return;
       setLoading(true);
-      console.log("Would do something here", program);
-      // create stake account if needed
+      if (props.stakeAccount === undefined) {
+        throw new Error("still loading stake account, please wait");
+      } else if (props.stakeAccount?.data === null) {
+        console.log("wallet", wallet);
+        // create stake account
+        // await program.rpc.initializeStakeAccount(props.stakeAccount.bump, {
+        //   accounts: {
+        //     owner: wallet.publicKey,
+        //     stakeAccount: props.stakeAccount.address,
+        //     rewarder: props.rewarder,
+        //     systemProgram: program,
+        //     rent: wallet,
+        //   },
+        //   signers: [wallet],
+        // });
+      }
       // create reward account if needed
       // stake nft
       setLoading(false);
@@ -30,7 +45,7 @@ export const StakeButton: FC<RowProps> = (props) => {
       setLoading(false);
       return;
     }
-  }, [notify, loading, program]);
+  }, [notify, loading, program, wallet, props]);
 
   if (loading) {
     return <Spinner />;
