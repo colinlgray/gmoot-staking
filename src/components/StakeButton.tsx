@@ -3,9 +3,8 @@ import { FC, useCallback, useState } from "react";
 import { Spinner } from "./index";
 import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
-import { useWallet, useAnchorWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { web3 } from "@project-serum/anchor";
-import { Signer } from "@solana/web3.js";
 
 export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
@@ -13,10 +12,8 @@ export const StakeButton: FC<RowProps> = (props) => {
   const [loading, setLoading] = useState(false);
   const program = useProgram();
   const wallet = useWallet();
-  const aWallet = useAnchorWallet();
 
   // check has stake account
-  console.log("stake account data", props.stakeAccount?.data);
   const onClick = useCallback(async () => {
     // If there isn't a program it's because the wallet is undefined
     if (
@@ -29,35 +26,29 @@ export const StakeButton: FC<RowProps> = (props) => {
     try {
       if (loading === true) return;
       setLoading(true);
+
+      // create stake account
       if (props.stakeAccount === undefined) {
         throw new Error("still loading stake account, please wait");
       } else if (props.stakeAccount?.data === null) {
-        // create stake account
-        // this doesn't work but is kinda close
-        const initArgs = {
-          accounts: {
-            owner: wallet.publicKey.toBase58(),
-            stakeAccount: props.stakeAccount.address.toBase58(),
-            rewarder: props.rewarder.address.toBase58(),
-            systemProgram: web3.SystemProgram.programId.toBase58(),
-            rent: wallet.publicKey.toBase58(),
-          },
-          // signers: [aWallet as Signer],
-        };
-
-        program.rpc
-          .initializeStakeAccount(props.stakeAccount.bump, initArgs)
-          .then((res) => {
-            console.log("SUCCESS!", res);
-            notify("success", "SUCCESS!!!");
-          })
-          .catch((e) => {
-            console.log("failed", e);
-            notify("error", `error: ${e?.message}`);
-          });
+        const stakeAccount = await program.rpc.initializeStakeAccount(
+          props.stakeAccount.bump,
+          {
+            accounts: {
+              owner: wallet.publicKey,
+              stakeAccount: props.stakeAccount.address,
+              rewarder: props.rewarder.address,
+              systemProgram: web3.SystemProgram.programId,
+              rent: web3.SYSVAR_RENT_PUBKEY,
+            },
+          }
+        );
+        console.log("Created Stake Account:", stakeAccount);
       }
       // create reward account if needed
+
       // stake nft
+      // notify("success", "SUCCESS!!!");
       setLoading(false);
     } catch (e: any) {
       console.log("Error with transaction", e);
