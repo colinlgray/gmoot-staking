@@ -64,6 +64,11 @@ export const StakeButton: FC<RowProps> = (props) => {
         tokenAccountAddress
       );
 
+      console.log(
+        "checking for reward account",
+        tokenAccountAddress.toBase58(),
+        receiverAccount
+      );
       const instructions: web3.TransactionInstruction[] = [];
       if (receiverAccount === null) {
         instructions.push(
@@ -78,11 +83,63 @@ export const StakeButton: FC<RowProps> = (props) => {
         );
       }
 
-      const transaction = new web3.Transaction().add(...instructions);
-      const signature = await wallet.sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "processed");
+      const nftMint = new web3.PublicKey(props.nft.data.mint);
+      const PDAassociatedTokenAccountAddress =
+        await splToken.Token.getAssociatedTokenAddress(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          nftMint,
+          props.stakeAccount.address,
+          true
+        );
+      const pdaAccount = await connection.getAccountInfo(
+        PDAassociatedTokenAccountAddress
+      );
+      console.log(
+        "checking for PDAassociatedTokenAccountAddress",
+        PDAassociatedTokenAccountAddress.toBase58(),
+        pdaAccount
+      );
+      if (pdaAccount === null) {
+        console.log("creating PDA AssociatedTokenAccount");
+        instructions.push(
+          splToken.Token.createAssociatedTokenAccountInstruction(
+            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+            splToken.TOKEN_PROGRAM_ID,
+            nftMint,
+            PDAassociatedTokenAccountAddress,
+            props.stakeAccount.address,
+            wallet.publicKey
+          )
+        );
+      }
+
+      if (instructions.length) {
+        const transaction = new web3.Transaction().add(...instructions);
+        const signature = await wallet.sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "processed");
+      }
 
       // stake nft
+
+      // await program.rpc.stakeGmoot({
+      //   accounts: {
+      //     owner: owner.publicKey,
+      //     rewarder,
+      //     rewardAuthority,
+      //     stakeAccount,
+      //     rewardMint: rewardMint.publicKey,
+      //     rewardTokenAccount,
+      //     nftMint: nftMint.publicKey,
+      //     nftTokenAccount,
+      //     nftVault,
+      //     tokenProgram: splToken.TOKEN_PROGRAM_ID,
+      //     systemProgram,
+      //     rent: rentSysvar,
+      //     clock: clockSysvar,
+      //   },
+      // });
+
       // notify("success", "SUCCESS!!!");
       setLoading(false);
     } catch (e: any) {
