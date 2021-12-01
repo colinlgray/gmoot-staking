@@ -121,24 +121,27 @@ export const StakeButton: FC<RowProps> = (props) => {
       }
 
       // stake nft
-
-      // await program.rpc.stakeGmoot({
-      //   accounts: {
-      //     owner: owner.publicKey,
-      //     rewarder,
-      //     rewardAuthority,
-      //     stakeAccount,
-      //     rewardMint: rewardMint.publicKey,
-      //     rewardTokenAccount,
-      //     nftMint: nftMint.publicKey,
-      //     nftTokenAccount,
-      //     nftVault,
-      //     tokenProgram: splToken.TOKEN_PROGRAM_ID,
-      //     systemProgram,
-      //     rent: rentSysvar,
-      //     clock: clockSysvar,
-      //   },
-      // });
+      // Error with transaction Error: 167: The given account is not owned by the executing program
+      // at Function.parse (error.ts:41)
+      // at Object.rpc [as stakeGmoot] (rpc.ts:28)
+      // at async StakeButton.tsx:125
+      await program.rpc.stakeGmoot({
+        accounts: {
+          owner: wallet.publicKey,
+          rewarder: props.rewarder.address,
+          rewardAuthority: props.rewarder.rewardAuthority,
+          stakeAccount,
+          rewardMint: props.rewarder.data.rewardMint,
+          rewardTokenAccount: tokenAccountAddress,
+          nftMint: nftMint,
+          nftTokenAccount: props.nft.pubkey,
+          nftVault: PDAassociatedTokenAccountAddress,
+          tokenProgram: splToken.TOKEN_PROGRAM_ID,
+          systemProgram: web3.SystemProgram.programId,
+          rent: web3.SYSVAR_RENT_PUBKEY,
+          clock: web3.SYSVAR_CLOCK_PUBKEY,
+        },
+      });
 
       // notify("success", "SUCCESS!!!");
       setLoading(false);
