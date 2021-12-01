@@ -3,8 +3,9 @@ import { FC, useCallback, useState } from "react";
 import { Spinner } from "./index";
 import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { web3 } from "@project-serum/anchor";
+import * as splToken from "@solana/spl-token";
 
 export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
@@ -12,6 +13,7 @@ export const StakeButton: FC<RowProps> = (props) => {
   const [loading, setLoading] = useState(false);
   const program = useProgram();
   const wallet = useWallet();
+  const { connection } = useConnection();
 
   // check has stake account
   const onClick = useCallback(async () => {
@@ -20,18 +22,19 @@ export const StakeButton: FC<RowProps> = (props) => {
       !program ||
       wallet === null ||
       wallet.publicKey === null ||
-      !props.rewarder
+      !props.rewarder ||
+      !props.stakeAccount
     )
       throw new WalletNotConnectedError();
     try {
       if (loading === true) return;
       setLoading(true);
-
+      let stakeAccount;
       // create stake account
       if (props.stakeAccount === undefined) {
         throw new Error("still loading stake account, please wait");
       } else if (props.stakeAccount?.data === null) {
-        const stakeAccount = await program.rpc.initializeStakeAccount(
+        stakeAccount = await program.rpc.initializeStakeAccount(
           props.stakeAccount.bump,
           {
             accounts: {
@@ -44,8 +47,40 @@ export const StakeButton: FC<RowProps> = (props) => {
           }
         );
         console.log("Created Stake Account:", stakeAccount);
+      } else {
+        stakeAccount = props.stakeAccount?.address.toBase58();
       }
+      console.log("using stake account", stakeAccount);
       // create reward account if needed
+      const tokenAccountAddress =
+        await splToken.Token.getAssociatedTokenAddress(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          props.rewarder.data.rewardMint,
+          props.stakeAccount.address,
+          true
+        );
+      const receiverAccount = await connection.getAccountInfo(
+        tokenAccountAddress
+      );
+
+      const instructions: web3.TransactionInstruction[] = [];
+      if (receiverAccount === null) {
+        instructions.push(
+          splToken.Token.createAssociatedTokenAccountInstruction(
+            splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+            splToken.TOKEN_PROGRAM_ID,
+            props.rewarder.data.rewardMint,
+            tokenAccountAddress,
+            props.stakeAccount.address,
+            wallet.publicKey
+          )
+        );
+      }
+
+      const transaction = new web3.Transaction().add(...instructions);
+      const signature = await wallet.sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, "processed");
 
       // stake nft
       // notify("success", "SUCCESS!!!");
@@ -56,7 +91,7 @@ export const StakeButton: FC<RowProps> = (props) => {
       setLoading(false);
       return;
     }
-  }, [notify, loading, program, wallet, props]);
+  }, [notify, loading, program, wallet, props, connection]);
 
   if (loading) {
     return <Spinner />;
