@@ -57,7 +57,7 @@ export const StakeButton: FC<RowProps> = (props) => {
           splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
           splToken.TOKEN_PROGRAM_ID,
           props.rewarder.data.rewardMint,
-          props.stakeAccount.address,
+          wallet.publicKey,
           true
         );
       const receiverAccount = await connection.getAccountInfo(
@@ -77,71 +77,63 @@ export const StakeButton: FC<RowProps> = (props) => {
             splToken.TOKEN_PROGRAM_ID,
             props.rewarder.data.rewardMint,
             tokenAccountAddress,
-            props.stakeAccount.address,
+            wallet.publicKey,
             wallet.publicKey
           )
         );
       }
 
       const nftMint = new web3.PublicKey(props.nft.data.mint);
-      const PDAassociatedTokenAccountAddress =
-        await splToken.Token.getAssociatedTokenAddress(
-          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-          splToken.TOKEN_PROGRAM_ID,
-          nftMint,
-          props.stakeAccount.address,
-          true
-        );
-      const pdaAccount = await connection.getAccountInfo(
-        PDAassociatedTokenAccountAddress
+      const nftVaultAddress = await splToken.Token.getAssociatedTokenAddress(
+        splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+        splToken.TOKEN_PROGRAM_ID,
+        nftMint,
+        props.stakeAccount.address,
+        true
       );
+      const pdaAccount = await connection.getAccountInfo(nftVaultAddress);
       console.log(
-        "checking for PDAassociatedTokenAccountAddress",
-        PDAassociatedTokenAccountAddress.toBase58(),
+        "checking for nftVaultA",
+        nftVaultAddress.toBase58(),
         pdaAccount
       );
       if (pdaAccount === null) {
-        console.log("creating PDA AssociatedTokenAccount");
+        console.log("creating PDA for nftVault");
         instructions.push(
           splToken.Token.createAssociatedTokenAccountInstruction(
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             splToken.TOKEN_PROGRAM_ID,
             nftMint,
-            PDAassociatedTokenAccountAddress,
+            nftVaultAddress,
             props.stakeAccount.address,
             wallet.publicKey
           )
         );
       }
 
-      if (instructions.length) {
-        const transaction = new web3.Transaction().add(...instructions);
-        const signature = await wallet.sendTransaction(transaction, connection);
-        await connection.confirmTransaction(signature, "processed");
-      }
+      instructions.push(
+        program.instruction.stakeGmoot({
+          accounts: {
+            owner: wallet.publicKey,
+            rewarder: props.rewarder.address,
+            rewardAuthority: props.rewarder.rewardAuthority,
+            stakeAccount,
+            rewardMint: props.rewarder.data.rewardMint,
+            rewardTokenAccount: tokenAccountAddress,
+            nftMint: nftMint,
+            nftTokenAccount: props.nft.pubkey,
+            nftVault: nftVaultAddress,
+            tokenProgram: splToken.TOKEN_PROGRAM_ID,
+            systemProgram: web3.SystemProgram.programId,
+            rent: web3.SYSVAR_RENT_PUBKEY,
+            clock: web3.SYSVAR_CLOCK_PUBKEY,
+          },
+        })
+      );
 
-      // stake nft
-      // Error with transaction Error: 167: The given account is not owned by the executing program
-      // at Function.parse (error.ts:41)
-      // at Object.rpc [as stakeGmoot] (rpc.ts:28)
-      // at async StakeButton.tsx:125
-      await program.rpc.stakeGmoot({
-        accounts: {
-          owner: wallet.publicKey,
-          rewarder: props.rewarder.address,
-          rewardAuthority: props.rewarder.rewardAuthority,
-          stakeAccount,
-          rewardMint: props.rewarder.data.rewardMint,
-          rewardTokenAccount: tokenAccountAddress,
-          nftMint: nftMint,
-          nftTokenAccount: props.nft.pubkey,
-          nftVault: PDAassociatedTokenAccountAddress,
-          tokenProgram: splToken.TOKEN_PROGRAM_ID,
-          systemProgram: web3.SystemProgram.programId,
-          rent: web3.SYSVAR_RENT_PUBKEY,
-          clock: web3.SYSVAR_CLOCK_PUBKEY,
-        },
-      });
+      const transaction = new web3.Transaction().add(...instructions);
+      const signature = await wallet.sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, "processed");
 
       // notify("success", "SUCCESS!!!");
       setLoading(false);
