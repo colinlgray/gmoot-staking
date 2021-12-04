@@ -14,31 +14,41 @@ export const StakeButton: FC<RowProps> = (props) => {
   const program = useProgram();
   const wallet = useWallet();
   const { connection } = useConnection();
-
+  console.log('stake account', props.stakeAccount)
   // check has stake account
   const onClick = useCallback(async () => {
+    const owner = wallet;
+    const stakeAccount = props.stakeAccount?.address;
     // If there isn't a program it's because the wallet is undefined
     if (
       !program ||
-      wallet === null ||
-      wallet.publicKey === null ||
+      owner === null ||
+      owner.publicKey === null ||
       !props.rewarder ||
-      !props.stakeAccount
+      !props.stakeAccount || 
+      !stakeAccount
     )
       throw new WalletNotConnectedError();
     try {
       if (loading === true) return;
       setLoading(true);
-      let stakeAccount;
-      // create stake account
+      let stakeAccountAddress = "";
       if (props.stakeAccount === undefined) {
         throw new Error("still loading stake account, please wait");
       } else if (props.stakeAccount?.data === null) {
-        stakeAccount = await program.rpc.initializeStakeAccount(
+
+
+      // create stake account if needed
+        if(wallet.publicKey === null){
+          throw new WalletNotConnectedError();
+        }
+        // TODO: Turn this into an instruction
+        // In the example this was done right before staking
+        stakeAccountAddress = await program.rpc.initializeStakeAccount(
           props.stakeAccount.bump,
           {
             accounts: {
-              owner: wallet.publicKey,
+              owner: owner.publicKey,
               stakeAccount: props.stakeAccount.address,
               rewarder: props.rewarder.address,
               systemProgram: web3.SystemProgram.programId,
@@ -46,18 +56,25 @@ export const StakeButton: FC<RowProps> = (props) => {
             },
           }
         );
-        console.log("Created Stake Account:", stakeAccount);
+        console.log("Created Stake Account:", stakeAccountAddress);
       } else {
-        stakeAccount = props.stakeAccount?.address.toBase58();
+        stakeAccountAddress = props.stakeAccount.address.toBase58();
       }
-      console.log("using stake account", stakeAccount);
+      console.log("using stake account", stakeAccountAddress);
+
+
+
       // create reward account if needed
+      // Here I'm doing this with createAssociatedTokenAccountInstruction but in the example 
+      // it is done with 
+      // const nftMint = await splToken.Token.createMint( ....
+      // const nftTokenAccount = await nftMint.createAssociatedTokenAccount(owner.publicKey);
       const tokenAccountAddress =
         await splToken.Token.getAssociatedTokenAddress(
           splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
           splToken.TOKEN_PROGRAM_ID,
           props.rewarder.data.rewardMint,
-          wallet.publicKey,
+          owner.publicKey,
           true
         );
       const receiverAccount = await connection.getAccountInfo(
@@ -77,11 +94,13 @@ export const StakeButton: FC<RowProps> = (props) => {
             splToken.TOKEN_PROGRAM_ID,
             props.rewarder.data.rewardMint,
             tokenAccountAddress,
-            wallet.publicKey,
-            wallet.publicKey
+            owner.publicKey,
+            owner.publicKey
           )
         );
       }
+
+      // create PDA Associated Token Account
 
       const nftMint = new web3.PublicKey(props.nft.data.mint);
       const nftVaultAddress = await splToken.Token.getAssociatedTokenAddress(
@@ -106,7 +125,7 @@ export const StakeButton: FC<RowProps> = (props) => {
             nftMint,
             nftVaultAddress,
             props.stakeAccount.address,
-            wallet.publicKey
+            owner.publicKey
           )
         );
       }
@@ -114,10 +133,10 @@ export const StakeButton: FC<RowProps> = (props) => {
       instructions.push(
         program.instruction.stakeGmoot({
           accounts: {
-            owner: wallet.publicKey,
+            owner: owner.publicKey,
             rewarder: props.rewarder.address,
             rewardAuthority: props.rewarder.rewardAuthority,
-            stakeAccount,
+            stakeAccount: stakeAccountAddress,
             rewardMint: props.rewarder.data.rewardMint,
             rewardTokenAccount: tokenAccountAddress,
             nftMint: nftMint,

@@ -27,7 +27,7 @@ export type RewarderAccount = {
   data: RewarderAccountData;
 };
 
-const collectionName = "gmoot";
+const collectionName = "gmoot2";
 
 export function useRewarder() {
   const wallet = useAnchorWallet();
