@@ -14,7 +14,7 @@ export const StakeButton: FC<RowProps> = (props) => {
   const program = useProgram();
   const wallet = useWallet();
   const { connection } = useConnection();
-  console.log('stake account', props.stakeAccount)
+
   // check has stake account
   const onClick = useCallback(async () => {
     const owner = wallet;
@@ -25,7 +25,7 @@ export const StakeButton: FC<RowProps> = (props) => {
       owner === null ||
       owner.publicKey === null ||
       !props.rewarder ||
-      !props.stakeAccount || 
+      !props.stakeAccount ||
       !stakeAccount
     )
       throw new WalletNotConnectedError();
@@ -36,10 +36,8 @@ export const StakeButton: FC<RowProps> = (props) => {
       if (props.stakeAccount === undefined) {
         throw new Error("still loading stake account, please wait");
       } else if (props.stakeAccount?.data === null) {
-
-
-      // create stake account if needed
-        if(wallet.publicKey === null){
+        // create stake account if needed
+        if (wallet.publicKey === null) {
           throw new WalletNotConnectedError();
         }
         // TODO: Turn this into an instruction
@@ -60,22 +58,15 @@ export const StakeButton: FC<RowProps> = (props) => {
       } else {
         stakeAccountAddress = props.stakeAccount.address.toBase58();
       }
-      console.log("using stake account", stakeAccountAddress);
-
-
 
       // create reward account if needed
-      // Here I'm doing this with createAssociatedTokenAccountInstruction but in the example 
-      // it is done with 
-      // const nftMint = await splToken.Token.createMint( ....
-      // const nftTokenAccount = await nftMint.createAssociatedTokenAccount(owner.publicKey);
       const tokenAccountAddress =
         await splToken.Token.getAssociatedTokenAddress(
           splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
           splToken.TOKEN_PROGRAM_ID,
           props.rewarder.data.rewardMint,
           owner.publicKey,
-          true
+          false
         );
       const receiverAccount = await connection.getAccountInfo(
         tokenAccountAddress
@@ -86,9 +77,9 @@ export const StakeButton: FC<RowProps> = (props) => {
         tokenAccountAddress.toBase58(),
         receiverAccount
       );
-      const instructions: web3.TransactionInstruction[] = [];
+      let instructions: web3.TransactionInstruction[] = [];
       if (receiverAccount === null) {
-        instructions.push(
+        instructions = [
           splToken.Token.createAssociatedTokenAccountInstruction(
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             splToken.TOKEN_PROGRAM_ID,
@@ -96,10 +87,14 @@ export const StakeButton: FC<RowProps> = (props) => {
             tokenAccountAddress,
             owner.publicKey,
             owner.publicKey
-          )
-        );
-      }
+          ),
+        ];
 
+        let transaction = new web3.Transaction().add(...instructions);
+        let signature = await wallet.sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "processed");
+        instructions = [];
+      }
       // create PDA Associated Token Account
 
       const nftMint = new web3.PublicKey(props.nft.data.mint);
@@ -111,14 +106,9 @@ export const StakeButton: FC<RowProps> = (props) => {
         true
       );
       const pdaAccount = await connection.getAccountInfo(nftVaultAddress);
-      console.log(
-        "checking for nftVaultA",
-        nftVaultAddress.toBase58(),
-        pdaAccount
-      );
+
       if (pdaAccount === null) {
-        console.log("creating PDA for nftVault");
-        instructions.push(
+        instructions = [
           splToken.Token.createAssociatedTokenAccountInstruction(
             splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
             splToken.TOKEN_PROGRAM_ID,
@@ -126,35 +116,41 @@ export const StakeButton: FC<RowProps> = (props) => {
             nftVaultAddress,
             props.stakeAccount.address,
             owner.publicKey
-          )
-        );
+          ),
+        ];
+        let transaction = new web3.Transaction().add(...instructions);
+        let signature = await wallet.sendTransaction(transaction, connection);
+        await connection.confirmTransaction(signature, "processed");
+        instructions = [];
       }
+      const nftTokenAccountAddress =
+        await splToken.Token.getAssociatedTokenAddress(
+          splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+          splToken.TOKEN_PROGRAM_ID,
+          nftMint,
+          owner.publicKey,
+          false
+        );
 
-      instructions.push(
-        program.instruction.stakeGmoot({
-          accounts: {
-            owner: owner.publicKey,
-            rewarder: props.rewarder.address,
-            rewardAuthority: props.rewarder.rewardAuthority,
-            stakeAccount: stakeAccountAddress,
-            rewardMint: props.rewarder.data.rewardMint,
-            rewardTokenAccount: tokenAccountAddress,
-            nftMint: nftMint,
-            nftTokenAccount: props.nft.pubkey,
-            nftVault: nftVaultAddress,
-            tokenProgram: splToken.TOKEN_PROGRAM_ID,
-            systemProgram: web3.SystemProgram.programId,
-            rent: web3.SYSVAR_RENT_PUBKEY,
-            clock: web3.SYSVAR_CLOCK_PUBKEY,
-          },
-        })
-      );
+      await program.rpc.stakeGmoot({
+        accounts: {
+          owner: owner.publicKey.toBase58(),
+          rewarder: props.rewarder.address.toBase58(),
+          rewardAuthority: props.rewarder.rewardAuthority.toBase58(),
+          stakeAccount: stakeAccountAddress,
+          rewardMint: props.rewarder.data.rewardMint.toBase58(),
+          rewardTokenAccount: tokenAccountAddress.toBase58(),
+          nftMint: nftMint.toBase58(),
+          nftTokenAccount: nftTokenAccountAddress,
+          nftVault: nftVaultAddress.toBase58(),
+          tokenProgram: splToken.TOKEN_PROGRAM_ID.toBase58(),
+          systemProgram: web3.SystemProgram.programId.toBase58(),
+          rent: web3.SYSVAR_RENT_PUBKEY.toBase58(),
+          clock: web3.SYSVAR_CLOCK_PUBKEY.toBase58(),
+        },
+      });
 
-      const transaction = new web3.Transaction().add(...instructions);
-      const signature = await wallet.sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "processed");
-
-      // notify("success", "SUCCESS!!!");
+      notify("success", "SUCCESS!!!");
       setLoading(false);
     } catch (e: any) {
       console.log("Error with transaction", e);
