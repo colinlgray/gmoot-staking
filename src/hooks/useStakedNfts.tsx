@@ -6,12 +6,14 @@ import { useStakeAccount } from "../hooks";
 export function useStakedNfts() {
   const { connection } = useConnection();
   const stakeAccount = useStakeAccount();
-  const [nftList, setNftList] = useState<any[] | undefined>();
+  const [nftList, setNftList] = useState<
+    programs.metadata.Metadata[] | undefined
+  >();
 
   useEffect(() => {
     let didCancel = false;
     const request = async () => {
-      if (!stakeAccount) {
+      if (!stakeAccount || nftList) {
         return;
       }
       programs.metadata.Metadata.findByOwnerV2(
@@ -29,7 +31,7 @@ export function useStakedNfts() {
     return () => {
       didCancel = true;
     };
-  }, [stakeAccount, connection]);
+  }, [stakeAccount, connection, nftList]);
 
   return nftList;
 }

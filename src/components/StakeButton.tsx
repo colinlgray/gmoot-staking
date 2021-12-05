@@ -28,6 +28,9 @@ export const StakeButton: FC<RowProps> = (props) => {
     )
       throw new WalletNotConnectedError();
     try {
+      if (props.isStaked === true) {
+        throw new Error("Not implemented yet");
+      }
       if (loading === true) return;
       setLoading(true);
       const stakeAccountAddress = props.stakeAccount.address.toBase58();
@@ -146,13 +149,21 @@ export const StakeButton: FC<RowProps> = (props) => {
   if (loading) {
     return <Spinner />;
   }
-
+  let color = "";
+  let copy = "";
+  if (props.isStaked) {
+    color = "red";
+    copy = "Unstake";
+  } else {
+    color = "green";
+    copy = "Stake";
+  }
   return (
     <button
       onClick={onClick}
-      className="bg-green-500 hover:bg-green-700 font-bold py-1 px-2 rounded"
+      className={`bg-${color}-500 hover:bg-${color}-700 font-bold py-1 px-2 rounded`}
     >
-      Stake
+      {copy}
     </button>
   );
 };

@@ -9,9 +9,11 @@ export interface RowProps {
   nft: programs.metadata.Metadata;
   rewarder?: RewarderAccount | null;
   stakeAccount?: StakeAccount | null;
+  isStaked: boolean;
 }
 
 export const NFTRow: FC<RowProps> = (props) => {
+  console.log("nft", props.nft.data);
   const [loading, setLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>({});
   useEffect(() => {
@@ -36,7 +38,7 @@ export const NFTRow: FC<RowProps> = (props) => {
   }
 
   return (
-    <div className="h-24 pr-2 flex justify-between items-center">
+    <div className="h-24 pr-2 flex justify-between items-center text-xs">
       <div className="flex flex-col">
         <div>Name: {metadata?.name}</div>
         <div>Description: {metadata?.description}</div>
