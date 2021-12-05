@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { programs } from "@metaplex/js";
-import { Spinner } from "../components";
+import { Spinner, MintButton } from "../components";
 import { NFTRow } from "./NFTRow";
 import { useRewarder, useStakeAccount } from "../hooks";
 
@@ -52,6 +52,11 @@ export function StakingInterface() {
   return (
     <div>
       <div className="text-lg py-4">Your nfts: {nftList?.length}</div>
+      {nftList?.length === 0 && (
+        <div>
+          <MintButton />
+        </div>
+      )}
       <div>
         {nftList?.map((nft) => {
           return (
