@@ -4,7 +4,7 @@ import { Spinner } from "./index";
 import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { createAccountsAndStake } from "../common/actions";
+import { createAccountsAndStake, unstakeGmoot } from "../common/actions";
 
 export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
@@ -26,19 +26,27 @@ export const StakeButton: FC<RowProps> = (props) => {
     )
       throw new WalletNotConnectedError();
     try {
-      if (props.isStaked === true) {
-        throw new Error("Not implemented yet");
-      }
       if (loading === true) return;
       setLoading(true);
-      await createAccountsAndStake({
-        program,
-        wallet,
-        connection,
-        rewarder: props.rewarder,
-        stakeAccount: props.stakeAccount,
-        nft: props.nft,
-      });
+      if (props.isStaked) {
+        await unstakeGmoot({
+          program,
+          wallet,
+          connection,
+          rewarder: props.rewarder,
+          stakeAccount: props.stakeAccount,
+          nft: props.nft,
+        });
+      } else {
+        await createAccountsAndStake({
+          program,
+          wallet,
+          connection,
+          rewarder: props.rewarder,
+          stakeAccount: props.stakeAccount,
+          nft: props.nft,
+        });
+      }
       notify("success", "SUCCESS!!!");
       setLoading(false);
     } catch (e: any) {

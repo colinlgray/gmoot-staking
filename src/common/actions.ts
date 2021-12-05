@@ -140,3 +140,46 @@ export async function createAccountsAndStake(props: StakeProps) {
   );
   return await props.connection.confirmTransaction(signature, "processed");
 }
+
+export async function unstakeGmoot(props: StakeProps) {
+  const tokenAccountAddress = await SplToken.Token.getAssociatedTokenAddress(
+    SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    SplToken.TOKEN_PROGRAM_ID,
+    props.rewarder.data.rewardMint,
+    props.wallet.publicKey!,
+    false
+  );
+  const nftMint = new web3.PublicKey(props.nft.data.mint);
+  const nftTokenAccountAddress = await SplToken.Token.getAssociatedTokenAddress(
+    SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    SplToken.TOKEN_PROGRAM_ID,
+    nftMint,
+    props.wallet.publicKey!,
+    false
+  );
+  const nftVaultAddress = await SplToken.Token.getAssociatedTokenAddress(
+    SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
+    SplToken.TOKEN_PROGRAM_ID,
+    nftMint,
+    props.stakeAccount.address,
+    true
+  );
+
+  return await props.program.rpc.unstakeGmoot({
+    accounts: {
+      owner: props.wallet.publicKey!.toBase58(),
+      rewarder: props.rewarder.address.toBase58(),
+      rewardAuthority: props.rewarder.rewardAuthority.toBase58(),
+      stakeAccount: props.stakeAccount.address.toBase58(),
+      rewardMint: props.rewarder.data.rewardMint.toBase58(),
+      rewardTokenAccount: tokenAccountAddress.toBase58(),
+      nftMint: nftMint.toBase58(),
+      nftTokenAccount: nftTokenAccountAddress,
+      nftVault: nftVaultAddress.toBase58(),
+      tokenProgram: SplToken.TOKEN_PROGRAM_ID.toBase58(),
+      systemProgram: web3.SystemProgram.programId.toBase58(),
+      rent: web3.SYSVAR_RENT_PUBKEY.toBase58(),
+      clock: web3.SYSVAR_CLOCK_PUBKEY.toBase58(),
+    },
+  });
+}
