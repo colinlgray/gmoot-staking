@@ -13,7 +13,6 @@ export interface RowProps {
 }
 
 export const NFTRow: FC<RowProps> = (props) => {
-  console.log("nft", props.nft.data);
   const [loading, setLoading] = useState(false);
   const [metadata, setMetadata] = useState<any>({});
   useEffect(() => {
@@ -46,7 +45,9 @@ export const NFTRow: FC<RowProps> = (props) => {
       <div>
         <div className="flex items-center">
           <img alt="nft" className="h-24 p-4" src={metadata.image} />
-          <StakeButton {...props} />
+          <div className="w-24 flex justify-center">
+            <StakeButton {...props} />
+          </div>
         </div>
       </div>
     </div>
