@@ -1,41 +1,21 @@
-import { useWallet } from "@solana/wallet-adapter-react";
-import { Spinner } from "../components";
+import { FC } from "react";
 import { NFTRow } from "./NFTRow";
-import {
-  useRewarder,
-  useStakeAccount,
-  useStakedNfts,
-  useWalletNfts,
-} from "../hooks";
+import { useRewarder, useStakeAccount } from "../hooks";
+import { programs } from "@metaplex/js";
 
-function ConnectWalletPrompt() {
-  return <div>Please connect your wallet</div>;
-}
 const headerClassName = "text-xl font-bold border-b-2 mb-6 py-2";
-export function StakingInterface() {
-  const { publicKey } = useWallet();
+interface Props {
+  walletNfts: programs.metadata.Metadata[];
+  stakedNfts: programs.metadata.Metadata[];
+}
+export const StakingInterface: FC<Props> = ({ stakedNfts, walletNfts }) => {
   const rewarder = useRewarder();
   const stakeAccount = useStakeAccount();
-  const stakedNfts = useStakedNfts();
-  const walletNfts = useWalletNfts();
-
-  if (!publicKey) {
-    return <ConnectWalletPrompt />;
-  }
-
-  if (stakedNfts === undefined || walletNfts === undefined) {
-    return (
-      <div className="flex items-center">
-        <div className="pr-6">{"Loading... < 1 min remaining"}</div>
-        <Spinner />
-      </div>
-    );
-  }
 
   if (stakedNfts.length === 0 && walletNfts.length === 0) {
     return (
       <div>
-        It looks like you don't have any NFTs. You can purchase them on the{" "}
+        It looks like you don't have any NFTs. You can purchase them on the
         <a href="https://digitaleyes.market/collections/Gmoot">
           secondary market
         </a>
@@ -77,4 +57,4 @@ export function StakingInterface() {
       </div>
     </div>
   );
-}
+};

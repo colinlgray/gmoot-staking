@@ -1,10 +1,9 @@
-import { StakingInterface, ClaimInterface } from "./containers";
-import { WalletConnectionProvider } from "./providers/WalletConnectionProvider";
 import {
   WalletModalProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
-
+import { WalletConnectionProvider } from "./providers/WalletConnectionProvider";
+import { Router } from "./containers";
 import { SnackbarProvider } from "notistack";
 
 function App() {
@@ -22,12 +21,7 @@ function App() {
                 <WalletMultiButton />
               </div>
             </header>
-            <div className="border-2 rounded p-12 mx-24 my-6">
-              <ClaimInterface />
-            </div>
-            <div className="border-2 rounded p-12 mx-24 my-6">
-              <StakingInterface />
-            </div>
+            <Router />
           </WalletModalProvider>
         </WalletConnectionProvider>
       </SnackbarProvider>
