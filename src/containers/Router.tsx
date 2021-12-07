@@ -17,7 +17,7 @@ export function Router() {
         </div>
       )}
       {publicKey && nftsUndefined && (
-        <div className="flex items-center">
+        <div className="border-2 rounded p-12 mx-24 my-6 flex items-center">
           <div className="pr-6">{"Loading... < 1 min remaining"}</div>
           <Spinner />
         </div>
