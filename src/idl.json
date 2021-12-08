@@ -1,6 +1,6 @@
 {
   "version": "0.0.0",
-  "name": "gmoot_staking",
+  "name": "sol_nft_staking",
   "instructions": [
     {
       "name": "initializeRewarder",
@@ -129,7 +129,7 @@
       ]
     },
     {
-      "name": "stakeGmoot",
+      "name": "stakeNft",
       "accounts": [
         {
           "name": "owner",
@@ -195,7 +195,7 @@
       "args": []
     },
     {
-      "name": "unstakeGmoot",
+      "name": "unstakeNft",
       "accounts": [
         {
           "name": "owner",
@@ -299,7 +299,7 @@
   ],
   "accounts": [
     {
-      "name": "GmootStakeRewarder",
+      "name": "NftStakeRewarder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -347,7 +347,7 @@
       }
     },
     {
-      "name": "GmootStakeAccount",
+      "name": "NftStakeAccount",
       "type": {
         "kind": "struct",
         "fields": [

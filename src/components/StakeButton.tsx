@@ -4,7 +4,7 @@ import { Spinner } from "./index";
 import { RowProps } from "../containers/NFTRow";
 import { useNotify, useProgram } from "../hooks";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { createAccountsAndStake, unstakeGmoot } from "../common/actions";
+import { createAccountsAndStake, unstakeNft } from "../common/actions";
 
 export const StakeButton: FC<RowProps> = (props) => {
   const notify = useNotify();
@@ -29,7 +29,7 @@ export const StakeButton: FC<RowProps> = (props) => {
       if (loading === true) return;
       setLoading(true);
       if (props.isStaked) {
-        await unstakeGmoot({
+        await unstakeNft({
           program,
           wallet,
           connection,

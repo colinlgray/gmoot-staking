@@ -96,7 +96,7 @@ export async function createAccountsAndStake(props: StakeProps) {
   );
   const nftMetadata = await Metadata.getPDA(nftMint);
   instructions.push(
-    props.program.instruction.stakeGmoot({
+    props.program.instruction.stakeNft({
       accounts: {
         owner: owner.publicKey!.toBase58(),
         rewarder: props.rewarder.address.toBase58(),
@@ -124,7 +124,7 @@ export async function createAccountsAndStake(props: StakeProps) {
   return await props.connection.confirmTransaction(signature, "processed");
 }
 
-export async function unstakeGmoot(props: StakeProps) {
+export async function unstakeNft(props: StakeProps) {
   const tokenAccountAddress = await SplToken.Token.getAssociatedTokenAddress(
     SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
     SplToken.TOKEN_PROGRAM_ID,
@@ -141,7 +141,7 @@ export async function unstakeGmoot(props: StakeProps) {
     false
   );
 
-  return await props.program.rpc.unstakeGmoot({
+  return await props.program.rpc.unstakeNft({
     accounts: {
       owner: props.wallet.publicKey!.toBase58(),
       rewarder: props.rewarder.address.toBase58(),

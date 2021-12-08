@@ -39,8 +39,8 @@ export function useStakeAccount() {
             ],
             program.programId
           );
-
-        const data = await program.account.gmootStakeAccount.fetchNullable(
+        console.log("keys", Object.keys(program.account));
+        const data = await program.account.nftStakeRewarder.fetchNullable(
           stakeAccountPDA
         );
         if (!didCancel) {

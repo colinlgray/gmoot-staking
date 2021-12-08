@@ -27,7 +27,7 @@ export type RewarderAccount = {
   data: RewarderAccountData;
 };
 
-const collectionName = "gmoot2";
+const collectionName = "gmoot3";
 
 export function useRewarder() {
   const wallet = useAnchorWallet();
@@ -63,7 +63,7 @@ export function useRewarder() {
         )
       )[0];
 
-      const data = await program.account.gmootStakeRewarder.fetchNullable(
+      const data = await program.account.nftStakeRewarder.fetchNullable(
         rewarder
       );
       if (!didCancel) {
