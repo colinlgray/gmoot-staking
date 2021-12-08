@@ -7,6 +7,7 @@ import { StakeAccount } from "../hooks/useStakeAccount";
 import { Idl, Program } from "@project-serum/anchor";
 import * as SplToken from "@solana/spl-token";
 import { WalletContextState } from "@solana/wallet-adapter-react";
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 
 export function filterGmoots(list: programs.metadata.Metadata[]) {
   const creatorKey = "8mxiQyfXpWdohutWgq652XQ5LT4AaX4Lf5c4gZsdNLfd";
@@ -85,27 +86,7 @@ export async function createAccountsAndStake(props: StakeProps) {
   // create PDA Associated Token Account
 
   const nftMint = new web3.PublicKey(props.nft.data.mint);
-  const nftVaultAddress = await SplToken.Token.getAssociatedTokenAddress(
-    SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-    SplToken.TOKEN_PROGRAM_ID,
-    nftMint,
-    props.stakeAccount.address,
-    true
-  );
-  const pdaAccount = await props.connection.getAccountInfo(nftVaultAddress);
 
-  if (pdaAccount === null) {
-    instructions.push(
-      SplToken.Token.createAssociatedTokenAccountInstruction(
-        SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-        SplToken.TOKEN_PROGRAM_ID,
-        nftMint,
-        nftVaultAddress,
-        props.stakeAccount.address,
-        owner.publicKey!
-      )
-    );
-  }
   const nftTokenAccountAddress = await SplToken.Token.getAssociatedTokenAddress(
     SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
     SplToken.TOKEN_PROGRAM_ID,
@@ -113,7 +94,7 @@ export async function createAccountsAndStake(props: StakeProps) {
     owner.publicKey!,
     false
   );
-
+  const nftMetadata = await Metadata.getPDA(nftMint);
   instructions.push(
     props.program.instruction.stakeGmoot({
       accounts: {
@@ -125,12 +106,14 @@ export async function createAccountsAndStake(props: StakeProps) {
         rewardTokenAccount: tokenAccountAddress.toBase58(),
         nftMint: nftMint.toBase58(),
         nftTokenAccount: nftTokenAccountAddress,
-        nftVault: nftVaultAddress.toBase58(),
         tokenProgram: SplToken.TOKEN_PROGRAM_ID.toBase58(),
         systemProgram: web3.SystemProgram.programId.toBase58(),
         rent: web3.SYSVAR_RENT_PUBKEY.toBase58(),
         clock: web3.SYSVAR_CLOCK_PUBKEY.toBase58(),
       },
+      remainingAccounts: [
+        { pubkey: nftMetadata, isSigner: false, isWritable: false },
+      ],
     })
   );
   let transaction = new web3.Transaction().add(...instructions);
@@ -157,13 +140,6 @@ export async function unstakeGmoot(props: StakeProps) {
     props.wallet.publicKey!,
     false
   );
-  const nftVaultAddress = await SplToken.Token.getAssociatedTokenAddress(
-    SplToken.ASSOCIATED_TOKEN_PROGRAM_ID,
-    SplToken.TOKEN_PROGRAM_ID,
-    nftMint,
-    props.stakeAccount.address,
-    true
-  );
 
   return await props.program.rpc.unstakeGmoot({
     accounts: {
@@ -175,7 +151,6 @@ export async function unstakeGmoot(props: StakeProps) {
       rewardTokenAccount: tokenAccountAddress.toBase58(),
       nftMint: nftMint.toBase58(),
       nftTokenAccount: nftTokenAccountAddress,
-      nftVault: nftVaultAddress.toBase58(),
       tokenProgram: SplToken.TOKEN_PROGRAM_ID.toBase58(),
       systemProgram: web3.SystemProgram.programId.toBase58(),
       rent: web3.SYSVAR_RENT_PUBKEY.toBase58(),

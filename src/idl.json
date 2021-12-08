@@ -172,11 +172,6 @@
           "isSigner": false
         },
         {
-          "name": "nftVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -239,11 +234,6 @@
         },
         {
           "name": "nftTokenAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftVault",
           "isMut": true,
           "isSigner": false
         },
@@ -465,46 +455,41 @@
     },
     {
       "code": 311,
-      "name": "InvalidNFTVaultAddress",
-      "msg": "The provided NFT vault token account is not the associated token account for the provided NFT mint and stake account"
+      "name": "InvalidStakedNFTOwner",
+      "msg": "The provided NFT token account is not owned by the provided stake account"
     },
     {
       "code": 312,
-      "name": "NFTVaultEmpty",
-      "msg": "The provided NFT vault token account does not have the token"
-    },
-    {
-      "code": 313,
       "name": "MetadataAccountNotFound",
       "msg": "There was no Metaplex Metadata account supplied"
     },
     {
-      "code": 314,
+      "code": 313,
       "name": "MetadataAccountNotOwnedByCorrectProgram",
       "msg": "The Metaplex Metadata account is not owned by the Metaplex Token Metadata program"
     },
     {
-      "code": 315,
+      "code": 314,
       "name": "InvalidMetadataAccountData",
       "msg": "The Metaplex Metadata account failed to deserialze"
     },
     {
-      "code": 316,
+      "code": 315,
       "name": "InvalidMetadataAccountAddress",
       "msg": "The Metaplex Metadata account did not have the expected PDA seeds"
     },
     {
-      "code": 317,
+      "code": 316,
       "name": "InvalidMetadataUpdateAuthority",
       "msg": "The Metaplex Metadata account did not have the expected update authority"
     },
     {
-      "code": 318,
+      "code": 317,
       "name": "InvalidMetadataCollectionPrefix",
       "msg": "The Metaplex Metadata account did not have a name beginning with the collection"
     },
     {
-      "code": 319,
+      "code": 318,
       "name": "InvalidMetadataCreators",
       "msg": "The Metaplex Metadata account did not have the expected creators"
     }
