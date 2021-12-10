@@ -41,9 +41,8 @@ export function useStakeAccount() {
             ],
             program.programId
           );
-        console.log("stake account", stakeAccountPDA.toBase58);
         try {
-          const data = await program.account.nftStakeRewarder.fetchNullable(
+          const data = await program.account.nftStakeAccount.fetchNullable(
             stakeAccountPDA
           );
           if (!didCancel) {

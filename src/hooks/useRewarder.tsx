@@ -53,7 +53,7 @@ export function useRewarder() {
           program.programId
         )
       )[0];
-      console.log("rewarder", rewarder.toBase58());
+      // console.log("rewarder", rewarder.toBase58());
       const rewardAuthority = (
         await PublicKey.findProgramAddress(
           [
