@@ -2,13 +2,18 @@ import { FC } from "react";
 import { NFTRow } from "./NFTRow";
 import { useRewarder, useStakeAccount } from "../hooks";
 import { programs } from "@metaplex/js";
-
+import { UpdateFuncProps } from "./Router";
 const headerClassName = "text-xl font-bold border-b-2 mb-6 py-2";
 interface Props {
   walletNfts: programs.metadata.Metadata[];
   stakedNfts: programs.metadata.Metadata[];
+  onNftUpdated: (props: UpdateFuncProps) => void;
 }
-export const StakingInterface: FC<Props> = ({ stakedNfts, walletNfts }) => {
+export const StakingInterface: FC<Props> = ({
+  stakedNfts,
+  walletNfts,
+  onNftUpdated,
+}) => {
   const rewarder = useRewarder();
   const stakeAccount = useStakeAccount();
 
@@ -36,6 +41,9 @@ export const StakingInterface: FC<Props> = ({ stakedNfts, walletNfts }) => {
               nft={nft}
               rewarder={rewarder}
               stakeAccount={stakeAccount}
+              onChange={(nftMoved) => {
+                onNftUpdated({ previousLocation: "staked", nftMoved });
+              }}
               isStaked
             />
           );
@@ -51,6 +59,9 @@ export const StakingInterface: FC<Props> = ({ stakedNfts, walletNfts }) => {
               rewarder={rewarder}
               stakeAccount={stakeAccount}
               isStaked={false}
+              onChange={(nftMoved) => {
+                onNftUpdated({ previousLocation: "wallet", nftMoved });
+              }}
             />
           );
         })}

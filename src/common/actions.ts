@@ -121,7 +121,7 @@ export async function createAccountsAndStake(props: StakeProps) {
     transaction,
     props.connection
   );
-  return await props.connection.confirmTransaction(signature, "processed");
+  return await props.connection.confirmTransaction(signature, "confirmed");
 }
 
 export async function unstakeNft(props: StakeProps) {

@@ -2,13 +2,41 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useStakedNfts, useWalletNfts } from "../hooks";
 import { StakingInterface, ClaimInterface } from "../containers";
 import { Spinner } from "../components";
+import { programs } from "@metaplex/js";
+
+export interface UpdateFuncProps {
+  previousLocation: "wallet" | "staked";
+  nftMoved: programs.metadata.Metadata;
+}
 
 export function Router() {
-  const stakedNfts = useStakedNfts();
-  const walletNfts = useWalletNfts();
+  const [stakedNfts, setStakedNfts] = useStakedNfts();
+  const [walletNfts, setWalletNfts] = useWalletNfts();
   const { publicKey } = useWallet();
   const walletNotConnected = !publicKey;
   const nftsUndefined = stakedNfts === undefined || walletNfts === undefined;
+
+  const updateNftList = (props: UpdateFuncProps) => {
+    if (stakedNfts === undefined || walletNfts === undefined) {
+      throw new Error("Unabled to find list");
+    }
+    let newStakedList = [...stakedNfts];
+    let newWalletList = [...walletNfts];
+    if (props.previousLocation === "staked") {
+      newWalletList.push(props.nftMoved);
+      newStakedList = newStakedList.filter(
+        (val) => val.pubkey.toBase58() !== props.nftMoved.pubkey.toBase58()
+      );
+    } else {
+      newStakedList.push(props.nftMoved);
+      newWalletList = newWalletList.filter(
+        (val) => val.pubkey.toBase58() !== props.nftMoved.pubkey.toBase58()
+      );
+    }
+    setStakedNfts(newStakedList);
+    setWalletNfts(newWalletList);
+  };
+
   return (
     <div>
       {walletNotConnected && (
@@ -28,7 +56,11 @@ export function Router() {
             <ClaimInterface />
           </div>
           <div className="border-2 rounded p-12 mx-24 my-6">
-            <StakingInterface stakedNfts={stakedNfts} walletNfts={walletNfts} />
+            <StakingInterface
+              stakedNfts={stakedNfts}
+              walletNfts={walletNfts}
+              onNftUpdated={updateNftList}
+            />
           </div>
         </>
       )}

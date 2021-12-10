@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { programs } from "@metaplex/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
-export function useWalletNfts() {
+export function useWalletNfts(): [
+  programs.metadata.Metadata[] | undefined,
+  Dispatch<SetStateAction<programs.metadata.Metadata[] | undefined>>
+] {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
   const [nftList, setNftList] = useState<
@@ -31,5 +34,5 @@ export function useWalletNfts() {
     };
   }, [publicKey, nftList, connection]);
 
-  return nftList;
+  return [nftList, setNftList];
 }

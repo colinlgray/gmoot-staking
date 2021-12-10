@@ -49,6 +49,7 @@ export const StakeButton: FC<RowProps> = (props) => {
       }
       notify("success", "SUCCESS!!!");
       setLoading(false);
+      props.onChange(props.nft);
     } catch (e: any) {
       console.log("Error with transaction", e);
       notify("error", `Transaction failed! ${e?.message}`);

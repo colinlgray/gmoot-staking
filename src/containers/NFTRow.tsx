@@ -10,6 +10,7 @@ export interface RowProps {
   rewarder?: RewarderAccount | null;
   stakeAccount?: StakeAccount | null;
   isStaked: boolean;
+  onChange: (nft: programs.metadata.Metadata) => void;
 }
 
 export const NFTRow: FC<RowProps> = (props) => {
@@ -46,7 +47,7 @@ export const NFTRow: FC<RowProps> = (props) => {
         <div className="flex items-center">
           <img alt="nft" className="h-24 p-4" src={metadata.image} />
           <div className="w-24 flex justify-center">
-            <StakeButton {...props} />
+            <StakeButton {...props} onChange={props.onChange} />
           </div>
         </div>
       </div>

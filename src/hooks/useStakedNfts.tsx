@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { programs } from "@metaplex/js";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useStakeAccount } from "../hooks";
 
-export function useStakedNfts() {
+export function useStakedNfts(): [
+  programs.metadata.Metadata[] | undefined,
+  Dispatch<SetStateAction<programs.metadata.Metadata[] | undefined>>
+] {
   const { connection } = useConnection();
   const stakeAccount = useStakeAccount();
   const [nftList, setNftList] = useState<
@@ -33,5 +36,5 @@ export function useStakedNfts() {
     };
   }, [stakeAccount, connection, nftList]);
 
-  return nftList;
+  return [nftList, setNftList];
 }
