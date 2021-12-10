@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { useRewarder } from "./useRewarder";
+import { useNotify } from ".";
 
 export type StakeAccountData = {
   owner: PublicKey;
@@ -23,6 +24,7 @@ export function useStakeAccount() {
   const program = useProgram();
   const rewarder = useRewarder();
   const [account, setAccount] = useState<StakeAccount | null>();
+  const notify = useNotify();
 
   useEffect(() => {
     let didCancel = false;
@@ -39,26 +41,30 @@ export function useStakeAccount() {
             ],
             program.programId
           );
-        console.log("keys", Object.keys(program.account));
-        const data = await program.account.nftStakeRewarder.fetchNullable(
-          stakeAccountPDA
-        );
-        if (!didCancel) {
-          setAccount({
-            bump: stakeAccountBump,
-            address: stakeAccountPDA,
-            data: data as StakeAccountData,
-          } as StakeAccount);
+        console.log("stake account", stakeAccountPDA.toBase58);
+        try {
+          const data = await program.account.nftStakeRewarder.fetchNullable(
+            stakeAccountPDA
+          );
+          if (!didCancel) {
+            setAccount({
+              bump: stakeAccountBump,
+              address: stakeAccountPDA,
+              data: data as StakeAccountData,
+            } as StakeAccount);
+          }
+        } catch (error) {
+          notify("error", `Unable to load stake account: ${error}`);
+          console.log("error", (error as any)?.message);
         }
       }
     };
-
     request();
 
     return () => {
       didCancel = true;
     };
-  }, [program, wallet, rewarder]);
+  }, [program, wallet, rewarder, notify]);
 
   return account;
 }

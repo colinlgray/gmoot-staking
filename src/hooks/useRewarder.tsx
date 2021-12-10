@@ -2,6 +2,7 @@ import { useProgram } from "./useProgram";
 import { useEffect, useState } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
+import { useNotify } from ".";
 
 export type Creator = {
   address: PublicKey;
@@ -27,7 +28,7 @@ export type RewarderAccount = {
   data: RewarderAccountData;
 };
 
-const collectionName = "gmoot3";
+const collectionName = "gmoot";
 
 export function useRewarder() {
   const wallet = useAnchorWallet();
@@ -35,6 +36,7 @@ export function useRewarder() {
   const [account, setAccount] = useState<RewarderAccount | null | undefined>(
     undefined
   );
+  const notify = useNotify();
 
   useEffect(() => {
     let didCancel = false;
@@ -51,6 +53,7 @@ export function useRewarder() {
           program.programId
         )
       )[0];
+      console.log("rewarder", rewarder.toBase58());
       const rewardAuthority = (
         await PublicKey.findProgramAddress(
           [
@@ -62,20 +65,24 @@ export function useRewarder() {
           program.programId
         )
       )[0];
-
-      const data = await program.account.nftStakeRewarder.fetchNullable(
-        rewarder
-      );
-      if (!didCancel) {
-        if (!data) {
-          setAccount(null);
-        } else {
-          setAccount({
-            address: rewarder,
-            rewardAuthority,
-            data: data as RewarderAccountData,
-          } as RewarderAccount);
+      try {
+        const data = await program.account.nftStakeRewarder.fetchNullable(
+          rewarder
+        );
+        if (!didCancel) {
+          if (!data) {
+            setAccount(null);
+          } else {
+            setAccount({
+              address: rewarder,
+              rewardAuthority,
+              data: data as RewarderAccountData,
+            } as RewarderAccount);
+          }
         }
+      } catch (e) {
+        console.log("Unable to load rewarder");
+        notify("error", `Error ${(e as any)?.message}`);
       }
     }
 
@@ -85,6 +92,6 @@ export function useRewarder() {
     return () => {
       didCancel = true;
     };
-  }, [program, wallet, account]);
+  }, [program, wallet, account, notify]);
   return account;
 }
