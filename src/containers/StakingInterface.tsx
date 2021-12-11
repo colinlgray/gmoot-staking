@@ -20,8 +20,12 @@ export const StakingInterface: FC<Props> = ({
   if (stakedNfts.length === 0 && walletNfts.length === 0) {
     return (
       <div>
-        It looks like you don't have any NFTs. You can purchase them on the
-        <a href="https://digitaleyes.market/collections/Gmoot">
+        It looks like you don't have any NFTs. You can purchase them on
+        the&nbsp;
+        <a
+          className="underline"
+          href="https://digitaleyes.market/collections/Gmoot"
+        >
           secondary market
         </a>
       </div>

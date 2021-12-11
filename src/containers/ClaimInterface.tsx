@@ -1,23 +1,24 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useEffect, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useCallback, useState, FC } from "react";
 import {
   Token,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { programs } from "@metaplex/js";
 import { useNotify, useRewarder, useProgram, useStakeAccount } from "../hooks";
 import { web3 } from "@project-serum/anchor";
 import { Spinner } from "../components";
 
-export function ClaimInterface() {
-  const { connection } = useConnection();
+interface Props {
+  tokenCount: number | null;
+}
+
+export const ClaimInterface: FC<Props> = (props) => {
   const rewarder = useRewarder();
   const wallet = useWallet();
   const stakeAccount = useStakeAccount();
   const notify = useNotify();
   const program = useProgram();
-  const [tokenCount, setTokenCount] = useState<null | number>(null);
   const [loading, setLoading] = useState(false);
 
   const claim = useCallback(async () => {
@@ -61,46 +62,7 @@ export function ClaimInterface() {
     }
   }, [program, rewarder, stakeAccount, wallet.publicKey, notify]);
 
-  useEffect(() => {
-    let didCancel = false;
-    const teardown = () => {
-      didCancel = true;
-    };
-
-    async function requestRewarder() {
-      // const rewardRate = 10;
-      if (!rewarder || !wallet.publicKey) {
-        return teardown;
-      }
-      const tokenAccountAddress = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        rewarder.data.rewardMint,
-        wallet.publicKey,
-        false
-      );
-      const rewarderAccount = await connection.getAccountInfo(
-        tokenAccountAddress
-      );
-
-      if (!didCancel) {
-        if (rewarderAccount !== null) {
-          const res = programs.deserialize(rewarderAccount?.data);
-          console.log("reward account info", res.amount.toNumber());
-          setTokenCount(res.amount.toNumber());
-          try {
-          } catch (e) {
-            notify("error", `Error: ${e}`);
-          }
-        }
-      }
-    }
-
-    requestRewarder();
-
-    return teardown;
-  }, [rewarder, wallet, connection, notify]);
-  const displayValue = tokenCount ? tokenCount * 0.000000001 : null;
+  const displayValue = props.tokenCount ? props.tokenCount * 0.000000001 : null;
   return (
     <div className="flex justify-between align-center items-center">
       <div className="flex flex-col">
@@ -121,4 +83,4 @@ export function ClaimInterface() {
       </div>
     </div>
   );
-}
+};
