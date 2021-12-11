@@ -4,13 +4,14 @@ import { PublicKey } from "@solana/web3.js";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { useRewarder } from "./useRewarder";
 import { useNotify } from ".";
+import { BN } from "@project-serum/anchor";
 
 export type StakeAccountData = {
   owner: PublicKey;
   rewarder: PublicKey;
   numStaked: number;
   bump: number;
-  lastClaimed: number;
+  lastClaimed: BN;
 };
 
 export type StakeAccount = {

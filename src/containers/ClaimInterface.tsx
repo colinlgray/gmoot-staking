@@ -11,6 +11,7 @@ import { Spinner } from "../components";
 
 interface Props {
   tokenCount: number | null;
+  pendingRewards: number | null;
 }
 
 export const ClaimInterface: FC<Props> = (props) => {
@@ -62,12 +63,17 @@ export const ClaimInterface: FC<Props> = (props) => {
     }
   }, [program, rewarder, stakeAccount, wallet.publicKey, notify]);
 
-  const displayValue = props.tokenCount ? props.tokenCount * 0.000000001 : null;
+  const displayValue = props.tokenCount
+    ? (props.tokenCount * 0.000000001).toPrecision(4)
+    : null;
+  const displayPendingValue = props.pendingRewards
+    ? (props.pendingRewards * 0.000000001).toPrecision(4)
+    : null;
   return (
     <div className="flex justify-between align-center items-center">
       <div className="flex flex-col">
         <div>Your tokens: {displayValue || 0}</div>
-        <div>Your pending rewards: {0}</div>
+        <div>Your pending rewards: {displayPendingValue || 0}</div>
       </div>
       <div className="w-24 flex justify-center">
         {loading && <Spinner />}
