@@ -1,4 +1,4 @@
-import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { useRef, useEffect, useState, Dispatch, SetStateAction } from "react";
 import { programs } from "@metaplex/js";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useStakeAccount } from "../hooks";
@@ -12,7 +12,15 @@ export function useStakedNfts(): [
   const [nftList, setNftList] = useState<
     programs.metadata.Metadata[] | undefined
   >();
-
+  const prevWalletId = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!prevWalletId.current) {
+      prevWalletId.current = stakeAccount?.address?.toBase58();
+    } else if (prevWalletId.current !== stakeAccount?.address?.toBase58()) {
+      prevWalletId.current = stakeAccount?.address?.toBase58();
+      setNftList(undefined);
+    }
+  }, [stakeAccount?.address]);
   useEffect(() => {
     let didCancel = false;
     const request = async () => {
