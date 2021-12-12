@@ -12,6 +12,7 @@ import { Spinner } from "../components";
 interface Props {
   tokenCount: number | null;
   pendingRewards: number | null;
+  onClaim: () => void;
 }
 
 export const ClaimInterface: FC<Props> = (props) => {
@@ -21,6 +22,7 @@ export const ClaimInterface: FC<Props> = (props) => {
   const notify = useNotify();
   const program = useProgram();
   const [loading, setLoading] = useState(false);
+  const onClaim = props.onClaim;
 
   const claim = useCallback(async () => {
     try {
@@ -57,18 +59,23 @@ export const ClaimInterface: FC<Props> = (props) => {
       console.log(`Transaction Id: ${txId}`, txId);
       setLoading(false);
       notify("success", `Claiming Successful. Transaction Id: ${txId}`);
+      onClaim();
     } catch (e) {
       setLoading(false);
       notify("error", `Error: ${e}`);
     }
-  }, [program, rewarder, stakeAccount, wallet.publicKey, notify]);
+  }, [program, rewarder, stakeAccount, wallet.publicKey, notify, onClaim]);
+  const precisionValue = 4;
+  let displayValue =
+    props.tokenCount && props.tokenCount.toString().length >= precisionValue
+      ? (props.tokenCount * 0.000000001).toPrecision(precisionValue)
+      : null;
+  let displayPendingValue =
+    props.pendingRewards &&
+    props.pendingRewards.toString().length >= precisionValue
+      ? (props.pendingRewards * 0.000000001).toPrecision(precisionValue)
+      : null;
 
-  const displayValue = props.tokenCount
-    ? (props.tokenCount * 0.000000001).toPrecision(4)
-    : null;
-  const displayPendingValue = props.pendingRewards
-    ? (props.pendingRewards * 0.000000001).toPrecision(4)
-    : null;
   return (
     <div className="flex justify-between align-center items-center">
       <div className="flex flex-col">
