@@ -84,7 +84,7 @@ export const ClaimInterface: FC<Props> = (props) => {
       </div>
       <div className="w-24 flex justify-center">
         {loading && <Spinner />}
-        {!loading && (
+        {!loading && displayPendingValue !== null && (
           <button
             onClick={claim}
             className="bg-green-500 hover:bg-green-700 font-bold py-1 px-2 rounded"

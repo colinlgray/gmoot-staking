@@ -120,6 +120,9 @@ export function Router() {
     justClaimed,
   ]);
 
+  const hideClaimInterface =
+    stakedNfts?.length === 0 && walletNfts?.length === 0;
+
   return (
     <div className="max-w-4xl m-auto">
       {walletNotConnected && (
@@ -135,16 +138,18 @@ export function Router() {
       )}
       {publicKey && !nftsUndefined && (
         <>
-          <div className="border-2 rounded p-12 mx-24 my-6">
-            <ClaimInterface
-              tokenCount={tokenCount}
-              pendingRewards={pendingRewards}
-              onClaim={() => {
-                setJustClaimed(true);
-                setUnstakeCount(unstakeCount + 1);
-              }}
-            />
-          </div>
+          {!hideClaimInterface && (
+            <div className="border-2 rounded p-12 mx-24 my-6">
+              <ClaimInterface
+                tokenCount={tokenCount}
+                pendingRewards={pendingRewards}
+                onClaim={() => {
+                  setJustClaimed(true);
+                  setUnstakeCount(unstakeCount + 1);
+                }}
+              />
+            </div>
+          )}
           <div className="border-2 rounded p-12 mx-24 my-6">
             <StakingInterface
               stakedNfts={stakedNfts}
