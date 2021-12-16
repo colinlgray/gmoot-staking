@@ -1,3 +1,9 @@
+# Overview
+
+This app is the front end to [Sol NFT Staking](https://github.com/VegetarianOrc/sol-nft-staking)
+
+Currently there is no filtering on the front end and it lists all NFTs. The app is functional but needs to be limited to only show gmoots.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
